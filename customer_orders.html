@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Orders - Rosellatte</title>
+  <style>
+    body { 
+      background: #f5efe6; 
+      font-family: Poppins, sans-serif; 
+      margin: 0;
+    }
+    
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      background-color: #5c4033;
+      color: white;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo img {
+      width: 50px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+    
+    nav a {
+      text-decoration: none;
+      color: white;
+      font-weight: 600;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #3b2f2f;
+    }
+    
+    .order-card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border-left: 5px solid #5c4033;
+    }
+    
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .order-id {
+      font-weight: bold;
+      color: #5c4033;
+      font-size: 1.1em;
+    }
+    
+    .order-status {
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+    
+    .status-preparing { background: #fff3cd; color: #856404; }
+    .status-out-for-delivery { background: #cce7ff; color: #004085; }
+    .status-completed { background: #d4edda; color: #155724; }
+    
+    .order-items {
+      margin: 15px 0;
+    }
+    
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    
+    .order-total {
+      text-align: right;
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 2px solid #5c4033;
+    }
+    
+    .order-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      font-size: 0.9em;
+      color: #666;
+    }
+    
+    .no-orders {
+      text-align: center;
+      padding: 40px;
+      background: white;
+      border-radius: 12px;
+      color: #666;
+    }
+    
+    .print-btn {
+      background: #5c4033;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    
+    .print-btn:hover {
+      background: #7c5542;
+    }
+    
+    .notification {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background: #5c4033;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+      max-width: 350px;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .notification.preparing {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .notification.out-for-delivery {
+      background: #cce7ff;
+      color: #004085;
+    }
+    
+    .notification.completed {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .receipt-view {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 2000;
+      overflow-y: auto;
+    }
+    
+    .receipt-content {
+      background: white;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    
+    .receipt-header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #5c4033;
+    }
+    
+    .receipt-close {
+      float: right;
+      background: #5c4033;
+      color: white;
+      border: none;
+      padding: 5px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    
+    .receipt-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .receipt-total {
+      font-weight: bold;
+      font-size: 1.3em;
+      text-align: right;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 2px solid #5c4033;
+    }
+    
+    .receive-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    .receive-btn:hover {
+      background: #218838;
+    }
+    
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    
+    .delete-btn:hover {
+      background: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="logo">
+      <img src="logo/logo_of_coffee.png" alt="Rosellatte Logo">
+      <h1>Rosellatte</h1>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="customer_orders.html">My Orders</a></li>
+        <li id="user-role"></li>
+        <li><a href="#" id="logout">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2>My Orders</h2>
+    <div id="orders-container"></div>
+  </div>
+
+  <!-- Receipt Modal -->
+  <div id="receipt-modal" class="receipt-view">
+    <div class="receipt-content">
+      <button class="receipt-close" onclick="window.closeReceipt()">✕ Close</button>
+      <div id="receipt-body"></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+      
+      // Check login and redirect if not customer
+      try {
+        const userStr = localStorage.getItem("user");
+        if (!userStr) {
+          window.location.href = "login.html";
+          return;
+        }
+        
+        const user = JSON.parse(userStr);
+        if (!user || user.role !== "customer") {
+          window.location.href = "login.html";
+          return;
+        }
+
+        // Display user role
+        const userRoleEl = document.getElementById("user-role");
+        if (userRoleEl) {
+          userRoleEl.textContent = user.role.toUpperCase();
+        }
+
+        // Logout function
+        const logoutBtn = document.getElementById("logout");
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+          });
+        }
+      } catch (error) {
+        console.error("Error initializing user:", error);
+        window.location.href = "login.html";
+      }
+
+    // Store previous order statuses to detect changes
+    let previousOrderStatuses = {};
+    
+    function showNotification(message, status) {
+      // Remove any existing notification
+      const existing = document.querySelector('.notification');
+      if (existing) {
+        existing.remove();
+      }
+      
+      // Create new notification
+      const notification = document.createElement('div');
+      notification.className = `notification ${status.toLowerCase().replace(' ', '-')}`;
+      notification.innerHTML = `
+        <strong>Order Update!</strong><br>
+        ${message}
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        notification.style.animation = 'slideIn 0.3s ease-out reverse';
+        setTimeout(() => notification.remove(), 300);
+      }, 5000);
+    }
+    
+    function normalizeStatus(status) {
+      if (!status) return '';
+      return String(status).trim();
+    }
+    
+    function checkStatusChanges(orders) {
+      // Check if this is the first load
+      const isFirstLoad = Object.keys(previousOrderStatuses).length === 0;
+      
+      if (!orders || !Array.isArray(orders)) {
+        return;
+      }
+      
+      orders.forEach(order => {
+        if (!order || !order.id) {
+          return;
+        }
+        
+        const orderId = order.id;
+        const currentStatus = normalizeStatus(order.status || 'Preparing');
+        const previousStatus = previousOrderStatuses[orderId] ? normalizeStatus(previousOrderStatuses[orderId]) : null;
+        
+        // If status changed and it's not the first load, show notification
+        if (!isFirstLoad && previousStatus && previousStatus !== currentStatus) {
+          // Only notify for Preparing, Out for Delivery, and Completed
+          const statusToCheck = currentStatus.toLowerCase();
+          if (statusToCheck.includes('preparing') || statusToCheck.includes('out for delivery') || statusToCheck.includes('completed')) {
+            let statusKey = 'Preparing';
+            if (statusToCheck.includes('out for delivery')) {
+              statusKey = 'Out for Delivery';
+            } else if (statusToCheck.includes('completed')) {
+              statusKey = 'Completed';
+            }
+            
+            const statusMessages = {
+              'Preparing': `Order #${orderId} is now being prepared! ☕`,
+              'Out for Delivery': `Order #${orderId} is out for delivery! 🚚`,
+              'Completed': `Order #${orderId} has been completed! ✅`
+            };
+            
+            if (statusMessages[statusKey]) {
+              showNotification(statusMessages[statusKey], statusKey);
+            }
+          }
+        }
+        
+        // Update previous status
+        previousOrderStatuses[orderId] = currentStatus;
+      });
+    }
+    
+    function loadCustomerOrders() {
+      try {
+        const ordersStr = localStorage.getItem("orders");
+        const orders = ordersStr ? JSON.parse(ordersStr) : [];
+        const container = document.getElementById("orders-container");
+        
+        if (!container) {
+          console.error("Orders container not found");
+          return;
+        }
+        
+        const currentUser = JSON.parse(localStorage.getItem("user"));
+        
+        // Filter orders for current customer if customer field exists
+        let customerOrders = orders;
+        if (currentUser && currentUser.username) {
+          customerOrders = orders.filter(order => 
+            order && order.customer && order.customer === currentUser.username
+          );
+        }
+        
+        // Check for status changes before updating display (only if we have orders)
+        if (customerOrders && customerOrders.length > 0) {
+          checkStatusChanges(customerOrders);
+        }
+        
+        if (!customerOrders || customerOrders.length === 0) {
+          container.innerHTML = `
+            <div class="no-orders">
+              <h3>No orders yet</h3>
+              <p>You haven't placed any orders. Start shopping now!</p>
+              <button class="print-btn" onclick="window.location.href='index.html'">Browse Menu</button>
+            </div>
+          `;
+          return;
+        }
+        
+        // Sort orders by ID (newest first)
+        customerOrders.sort((a, b) => (b.id || 0) - (a.id || 0));
+        
+        container.innerHTML = customerOrders.map(order => {
+          if (!order || !order.items || !Array.isArray(order.items)) {
+            return '';
+          }
+          
+          const statusClass = order.status ? order.status.toLowerCase().replace(/\s+/g, '-') : 'preparing';
+          const total = order.items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+          const orderDate = order.orderDate ? new Date(order.orderDate) : (order.id ? new Date(order.id) : new Date());
+          
+          return `
+            <div class="order-card">
+              <div class="order-header">
+                <div class="order-id">Order #${order.id || 'N/A'}</div>
+                <div class="order-status status-${statusClass}">
+                  ${order.status || 'Preparing'}
+                </div>
+              </div>
+              
+              <div class="order-items">
+                ${order.items.map(item => `
+                  <div class="order-item">
+                    <span>${item.name || 'Unknown Item'}</span>
+                    <span>₱${(parseFloat(item.price) || 0).toFixed(2)}</span>
+                  </div>
+                `).join('')}
+              </div>
+              
+              <div class="order-total">
+                Total: ₱${total.toFixed(2)}
+              </div>
+              
+              <div class="order-meta">
+                <div>
+                  <strong>Payment Method:</strong> ${order.paymentMethod || 'N/A'}
+                  ${order.paymentMethod && (order.paymentMethod.toLowerCase().includes('gcash') || order.paymentMethod.toLowerCase().includes('credit')) ? 
+                    '<span style="color: #856404; margin-left: 10px;">⏳ Pending</span>' : 
+                    '<span style="color: #155724; margin-left: 10px;">✓ Paid</span>'}
+                </div>
+                <div><strong>Order Date:</strong> ${orderDate.toLocaleDateString()} ${orderDate.toLocaleTimeString()}</div>
+              </div>
+              
+              <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <button class="print-btn" onclick="viewReceipt(${order.id})">View Receipt</button>
+                ${order.status === 'Completed' && !order.received ? 
+                  '<button class="receive-btn" onclick="receiveOrder(' + order.id + ')">✓ Receive Order</button>' : 
+                  order.received ? '<span style="color: #28a745; font-weight: bold; padding: 8px 15px;">✓ Order Received</span>' : ''}
+              </div>
+            </div>
+          `;
+        }).filter(html => html !== '').join('');
+      } catch (error) {
+        console.error("Error loading customer orders:", error);
+        const container = document.getElementById("orders-container");
+        if (container) {
+          container.innerHTML = `
+            <div class="no-orders">
+              <h3>Error loading orders</h3>
+              <p>Please refresh the page or contact support.</p>
+            </div>
+          `;
+        }
+      }
+    }
+
+    // Make functions globally accessible for onclick handlers
+    window.viewReceipt = function(orderId) {
+      try {
+        const ordersStr = localStorage.getItem("orders");
+        const orders = ordersStr ? JSON.parse(ordersStr) : [];
+        const order = orders.find(o => o && o.id === orderId);
+        
+        if (!order) {
+          alert("Order not found!");
+          return;
+        }
+        
+        const total = order.items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+        const orderDate = order.orderDate ? new Date(order.orderDate) : (order.id ? new Date(order.id) : new Date());
+        const statusClass = order.status ? order.status.toLowerCase().replace(/\s+/g, '-') : 'preparing';
+        
+        const receiptBody = document.getElementById("receipt-body");
+        const receiptModal = document.getElementById("receipt-modal");
+        
+        if (!receiptBody || !receiptModal) {
+          alert("Receipt view not available!");
+          return;
+        }
+        
+        receiptBody.innerHTML = `
+          <div class="receipt-header">
+            <h2 style="color: #5c4033; margin: 0;">Rosellatte Coffee & Sweets</h2>
+            <p style="margin: 5px 0;">Order Receipt</p>
+          </div>
+          
+          <div style="margin: 20px 0;">
+            <p><strong>Order #${order.id}</strong></p>
+            <p>Date: ${orderDate.toLocaleString()}</p>
+            <p>Customer: ${order.customer || 'Guest'}</p>
+            <p>Status: <span class="order-status status-${statusClass}" style="display: inline-block; padding: 3px 10px; border-radius: 15px; font-size: 0.9em;">${order.status || 'Preparing'}</span></p>
+          </div>
+          
+          <div style="margin: 20px 0;">
+            <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 10px;">Items:</h3>
+            ${order.items.map(item => `
+              <div class="receipt-item">
+                <span>${item.name || 'Unknown Item'}</span>
+                <span>₱${(parseFloat(item.price) || 0).toFixed(2)}</span>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div class="receipt-total">
+            Total: ₱${total.toFixed(2)}
+          </div>
+          
+          <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+            <p><strong>Payment Method:</strong> ${order.paymentMethod || 'N/A'}</p>
+            ${order.paymentMethod && (order.paymentMethod.toLowerCase().includes('gcash') || order.paymentMethod.toLowerCase().includes('credit')) ? 
+              '<p style="color: #856404; background: #fff3cd; padding: 10px; border-radius: 5px; margin-top: 10px;"><strong>⚠ Online Payment:</strong> Please complete your payment through ' + order.paymentMethod + ' to confirm your order.</p>' : 
+              ''}
+          </div>
+          
+          <div style="text-align: center; margin-top: 30px; color: #666; font-size: 0.9em;">
+            <p>Thank you for your order!</p>
+            <p>Rosellatte Coffee & Sweets</p>
+          </div>
+          
+          <div style="text-align: center; margin-top: 20px;">
+            <button class="print-btn" onclick="window.print()">Print Receipt</button>
+          </div>
+        `;
+        
+        receiptModal.style.display = 'block';
+      } catch (error) {
+        console.error("Error viewing receipt:", error);
+        alert("Error loading receipt. Please try again.");
+      }
+    };
+    
+    window.closeReceipt = function() {
+      const receiptModal = document.getElementById("receipt-modal");
+      if (receiptModal) {
+        receiptModal.style.display = 'none';
+      }
+    };
+    
+    // Close receipt when clicking outside
+    window.onclick = function(event) {
+      const receiptModal = document.getElementById("receipt-modal");
+      if (event.target === receiptModal) {
+        window.closeReceipt();
+      }
+    };
+    
+    window.receiveOrder = function(orderId) {
+      try {
+        if (!confirm("Are you sure you want to mark this order as received?")) {
+          return;
+        }
+        
+        const ordersStr = localStorage.getItem("orders");
+        const orders = ordersStr ? JSON.parse(ordersStr) : [];
+        const orderIndex = orders.findIndex(o => o && o.id === orderId);
+        
+        if (orderIndex === -1) {
+          alert("Order not found!");
+          return;
+        }
+        
+        const order = orders[orderIndex];
+        if (order.status !== 'Completed') {
+          alert("Order must be completed before receiving!");
+          return;
+        }
+        
+        if (order.received) {
+          alert("Order already received!");
+          return;
+        }
+        
+        // Mark order as received
+        orders[orderIndex].received = true;
+        orders[orderIndex].receivedAt = new Date().toISOString();
+        localStorage.setItem("orders", JSON.stringify(orders));
+        
+        // Create notification for staff and admin
+        const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+        notifications.push({
+          id: Date.now(),
+          type: "order_received",
+          message: `Order #${orderId} has been received by customer ${order.customer || 'Guest'}`,
+          orderId: orderId,
+          customer: order.customer,
+          timestamp: new Date().toISOString(),
+          read: false
+        });
+        localStorage.setItem("notifications", JSON.stringify(notifications));
+        
+        // Trigger storage event for other tabs
+        window.dispatchEvent(new CustomEvent('orderReceived', {
+          detail: { orderId, customer: order.customer }
+        }));
+        
+        // Reload orders
+        loadCustomerOrders();
+        
+        // Show success message
+        showNotification(`Order #${orderId} has been marked as received! Thank you!`, 'completed');
+      } catch (error) {
+        console.error("Error receiving order:", error);
+        alert("Error receiving order. Please try again.");
+      }
+    };
+
+    // Auto-refresh orders every 3 seconds to check for status updates (faster for better UX)
+    let refreshInterval;
+    function startAutoRefresh() {
+      // Clear any existing interval
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+      refreshInterval = setInterval(() => {
+        loadCustomerOrders();
+      }, 3000);
+    }
+    
+    // Also listen for storage changes (when staff updates in another tab/window)
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'orders') {
+        loadCustomerOrders();
+      }
+    });
+    
+    // Listen for custom event (when staff updates in same tab/window - though unlikely)
+    window.addEventListener('orderStatusUpdated', (e) => {
+      loadCustomerOrders();
+    });
+    
+    // Poll for changes more aggressively (for same-tab updates)
+    let lastOrdersHash = '';
+    function checkForOrderUpdates() {
+      try {
+        const ordersStr = localStorage.getItem("orders");
+        const orders = ordersStr ? JSON.parse(ordersStr) : [];
+        const currentUser = JSON.parse(localStorage.getItem("user"));
+        
+        if (currentUser && currentUser.username) {
+          const customerOrders = orders.filter(order => 
+            order && order.customer && order.customer === currentUser.username
+          );
+          const ordersHash = JSON.stringify(customerOrders.map(o => ({ id: o.id, status: o.status })));
+          
+          if (ordersHash !== lastOrdersHash && lastOrdersHash !== '') {
+            loadCustomerOrders();
+          }
+          lastOrdersHash = ordersHash;
+        }
+      } catch (error) {
+        console.error("Error checking for updates:", error);
+      }
+    }
+    
+      // Check for updates every second
+      setInterval(checkForOrderUpdates, 1000);
+
+      // Initialize page
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          try {
+            loadCustomerOrders();
+            startAutoRefresh();
+          } catch (error) {
+            console.error("Error initializing page:", error);
+          }
+        });
+      } else {
+        try {
+          loadCustomerOrders();
+          startAutoRefresh();
+        } catch (error) {
+          console.error("Error initializing page:", error);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

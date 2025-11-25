@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Orders - Rosellatte</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { background:#f5efe6; font-family:Poppins, sans-serif; }
+    .container { max-width:900px; margin:auto; padding:40px; }
+    h2 { text-align:center; margin-bottom:20px; }
+    .order-card { background:white; padding:20px; border-radius:12px; margin-bottom:15px; box-shadow:0 4px 12px rgba(0,0,0,0.15); display:flex; justify-content:space-between; align-items:center; }
+    .order-info { line-height:1.6; }
+    select, button { padding:8px; border-radius:8px; border:1px solid #5c4033; }
+    button { background:#5c4033; color:white; border:none; cursor:pointer; }
+    .delete-btn { background:#dc3545; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; margin-left:10px; }
+    .delete-btn:hover { background:#c82333; }
+  </style>
+</head>
+<body>
+    <div class="container">
+  <h2>Order Management (Staff)</h2>
+  <div id="orders"></div>
+</div>
+
+<script>
+  // In staff_orders.html, update the loadOrders function
+function loadOrders() {
+  try {
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+    const container = document.getElementById("orders");
+    
+    if (!container) {
+      console.error("Orders container not found");
+      return;
+    }
+    
+    if (orders.length === 0) {
+      container.innerHTML = `
+        <div class="order-card">
+          <div class="order-info">
+            <p>No orders yet. Orders will appear here when customers place them.</p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = "";
+    orders.forEach((order, index) => {
+      if (!order || !order.id) return;
+      
+      const itemsList = order.items && Array.isArray(order.items) 
+        ? order.items.map(i => i.name || 'Unknown').join(", ")
+        : 'No items';
+      
+      const currentStatus = order.status || 'Preparing';
+      
+      container.innerHTML += `
+        <div class="order-card">
+          <div class="order-info">
+            <strong>Order #${order.id}</strong><br>
+            Customer: ${order.customer || 'Guest'}<br>
+            Items: ${itemsList}<br>
+            Payment: ${order.paymentMethod || 'N/A'}<br>
+            Status: <strong>${currentStatus}</strong>
+            ${order.received ? '<br><span style="color: #28a745; font-weight: bold;">✓ Received by Customer</span>' : ''}
+          </div>
+
+          <div>
+            <select onchange="updateStatus(${index}, this.value)">
+              <option value="Preparing" ${currentStatus=="Preparing"?"selected":""}>Preparing</option>
+              <option value="Out for Delivery" ${currentStatus=="Out for Delivery"?"selected":""}>Out for Delivery</option>
+              <option value="Completed" ${currentStatus=="Completed"?"selected":""}>Completed</option>
+            </select>
+            ${order.received ? `<button class="delete-btn" onclick="deleteOrder(${index})">Delete Order</button>` : ''}
+          </div>
+        </div>
+      `;
+    });
+  } catch (error) {
+    console.error("Error loading orders:", error);
+    const container = document.getElementById("orders");
+    if (container) {
+      container.innerHTML = `
+        <div class="order-card">
+          <div class="order-info">
+            <p>Error loading orders. Please refresh the page.</p>
+          </div>
+        </div>
+      `;
+    }
+  }
+}
+
+  function updateStatus(index, newStatus) {
+    try {
+      let orders = JSON.parse(localStorage.getItem("orders")) || [];
+      if (orders[index]) {
+        const oldStatus = orders[index].status;
+        orders[index].status = newStatus;
+        localStorage.setItem("orders", JSON.stringify(orders));
+        
+        // Trigger storage event for other tabs/windows
+        // Also dispatch custom event for same-tab updates
+        window.dispatchEvent(new CustomEvent('orderStatusUpdated', { 
+          detail: { orderId: orders[index].id, oldStatus, newStatus } 
+        }));
+        
+        loadOrders();
+        
+        // Show confirmation
+        console.log(`Order #${orders[index].id} status updated from "${oldStatus}" to "${newStatus}"`);
+      } else {
+        alert("Order not found!");
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Error updating order status. Please try again.");
+    }
+  }
+  
+  function deleteOrder(index) {
+    try {
+      if (!confirm("Are you sure you want to delete this order? This action cannot be undone.")) {
+        return;
+      }
+      
+      let orders = JSON.parse(localStorage.getItem("orders")) || [];
+      if (orders[index] && orders[index].received) {
+        orders.splice(index, 1);
+        localStorage.setItem("orders", JSON.stringify(orders));
+        
+        // Trigger storage event
+        window.dispatchEvent(new CustomEvent('orderDeleted', {
+          detail: { index }
+        }));
+        
+        loadOrders();
+        alert("Order deleted successfully!");
+      } else {
+        alert("Can only delete orders that have been received by the customer!");
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      alert("Error deleting order. Please try again.");
+    }
+  }
+
+  // Check if user is staff
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user || user.role !== "staff") {
+    window.location.href = "login.html";
+  }
+
+  function logout() {
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
+  }
+
+  // Auto-refresh orders every 5 seconds
+  setInterval(loadOrders, 5000);
+  
+  // Listen for order received notifications
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'notifications') {
+      checkNotifications();
+    }
+  });
+  
+  window.addEventListener('orderReceived', (e) => {
+    checkNotifications();
+  });
+  
+  function checkNotifications() {
+    const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+    const unread = notifications.filter(n => !n.read && n.type === 'order_received');
+    if (unread.length > 0) {
+      const latest = unread[unread.length - 1];
+      alert(`📦 ${latest.message}`);
+      // Mark as read
+      const index = notifications.findIndex(n => n.id === latest.id);
+      if (index !== -1) {
+        notifications[index].read = true;
+        localStorage.setItem("notifications", JSON.stringify(notifications));
+      }
+    }
+  }
+  
+  // Check notifications every 2 seconds
+  setInterval(checkNotifications, 2000);
+
+  loadOrders();
+</script>
+
+<button onclick="logout()" style="position:fixed; top:20px; right:20px; padding:10px 15px; background:#5c4033; color:white; border:none; border-radius:8px; cursor:pointer;">
+  Logout
+</button>
+</body>
+</html>

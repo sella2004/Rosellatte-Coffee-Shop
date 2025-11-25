@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Rosellatte</title>
+  <style>
+    body { background:#f5efe6; font-family:Poppins, sans-serif; margin:0; }
+    .container { max-width:1100px; margin:auto; padding:40px; }
+    h2 { text-align:center; margin-bottom:30px; color:#3b2f2f; }
+    .section-title { margin:25px 0 10px; font-size:1.3em; font-weight:600; color:#5c4033; }
+
+    .card { background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.15); margin-bottom:20px; }
+
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { text-align:left; padding:12px; border-bottom:1px solid #ddd; }
+    th { background:#5c4033; color:white; }
+
+    input, select, button { padding:10px; border-radius:8px; border:1px solid #7c5542; }
+    button { background:#5c4033; color:white; border:none; cursor:pointer; }
+    button:hover { background:#7c5542; }
+
+    .form-row { display:flex; gap:10px; margin-top:10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Administrator Dashboard</h2>
+
+    <!-- Menu Management UI -->
+    <div class="card">
+      <div class="section-title">Manage Menu Items</div>
+      <table>
+        <thead>
+          <tr><th>Item Name</th><th>Price (₱)</th><th>Category</th><th>Action</th></tr>
+        </thead>
+        <tbody id="menu-table"></tbody>
+      </table>
+      <div class="form-row">
+        <input id="new-item-name" type="text" placeholder="New item name" required>
+        <input id="new-item-price" type="number" placeholder="Price" min="0" step="0.01" required>
+        <select id="new-item-category">
+          <option value="drinks">Drinks</option>
+          <option value="desserts">Desserts</option>
+        </select>
+        <button onclick="addMenuFromForm()">Add Item</button>
+      </div>
+    </div>
+
+    <!-- User Management UI -->
+    <div class="card">
+      <div class="section-title">Manage User Accounts</div>
+      <table>
+        <thead>
+          <tr><th>Username</th><th>Role</th><th>Action</th></tr>
+        </thead>
+        <tbody id="user-table"></tbody>
+      </table>
+      <div class="form-row">
+        <input id="new-username" type="text" placeholder="New username" required>
+        <select id="new-role">
+          <option value="customer">Customer</option>
+          <option value="staff">Staff</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button onclick="addUserFromForm()">Add User</button>
+      </div>
+    </div>
+
+  </div>
+  <script>
+    // Check if user is admin
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user || user.role !== "admin") {
+      window.location.href = "login.html";
+    }
+
+    // Load saved data or defaults
+    let menuItems = JSON.parse(localStorage.getItem("menuItems")) || [
+      { name: "Americano", price: 120, category: "drinks" },
+      { name: "Cappuccino", price: 110, category: "drinks" },
+      { name: "Matcha Latte", price: 140, category: "drinks" },
+      { name: "Caramel Macchiato", price: 135, category: "drinks" },
+      { name: "Espresso", price: 120, category: "drinks" },
+      { name: "Caramel Latte", price: 150, category: "drinks" },
+      { name: "Classic Cheesecake", price: 80, category: "desserts" },
+      { name: "Chocolate Lava Cake", price: 120, category: "desserts" },
+      { name: "Red Velvet Cake", price: 110, category: "desserts" },
+      { name: "Vanilla Cake", price: 140, category: "desserts" },
+      { name: "Blueberry Muffin", price: 110, category: "desserts" },
+      { name: "Chocolate Chip Muffin", price: 80, category: "desserts" },
+      { name: "Banana Nut Muffin", price: 125, category: "desserts" }
+    ];
+    
+    let users = JSON.parse(localStorage.getItem("users")) || [
+      { username: "staff1", role: "staff", password: "staff123" },
+      { username: "admin1", role: "admin", password: "admin123" }
+    ];
+
+    function saveMenu() {
+      localStorage.setItem("menuItems", JSON.stringify(menuItems));
+      // Trigger a custom event to notify other pages (same tab/window)
+      window.dispatchEvent(new CustomEvent('menuUpdated'));
+      // Also trigger storage event for other tabs/windows
+      // Note: storage event only fires in OTHER tabs, not the current one
+      // So we use both custom event and periodic checking in index.html
+    }
+    
+    function saveUsers() {
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+
+    function renderMenu() {
+      const table = document.getElementById("menu-table");
+      if (!table) return;
+      
+      table.innerHTML = "";
+      menuItems.forEach((item, index) => {
+        table.innerHTML += `<tr>
+          <td><input value="${item.name || ''}" onchange="menuItems[${index}].name=this.value; saveMenu();" style="width:100%; padding:5px;"></td>
+          <td><input type='number' value="${item.price || 0}" onchange="menuItems[${index}].price=parseFloat(this.value) || 0; saveMenu();" style="width:100%; padding:5px;" min="0" step="0.01"></td>
+          <td>
+            <select onchange="menuItems[${index}].category=this.value; saveMenu();" style="width:100%; padding:5px;">
+              <option value="drinks" ${item.category === 'drinks' ? 'selected' : ''}>Drinks</option>
+              <option value="desserts" ${item.category === 'desserts' ? 'selected' : ''}>Desserts</option>
+            </select>
+          </td>
+          <td><button onclick="deleteMenu(${index})">Delete</button></td>
+        </tr>`;
+      });
+      saveMenu();
+    }
+
+    function addMenuFromForm() {
+      const nameInput = document.getElementById("new-item-name");
+      const priceInput = document.getElementById("new-item-price");
+      const categoryInput = document.getElementById("new-item-category");
+      
+      if (!nameInput || !priceInput || !categoryInput) {
+        alert("Form elements not found!");
+        return;
+      }
+      
+      const name = nameInput.value.trim();
+      const price = parseFloat(priceInput.value);
+      const category = categoryInput.value;
+      
+      if (!name) {
+        alert("Please enter an item name!");
+        nameInput.focus();
+        return;
+      }
+      
+      if (isNaN(price) || price < 0) {
+        alert("Please enter a valid price!");
+        priceInput.focus();
+        return;
+      }
+      
+      // Check if item already exists
+      if (menuItems.some(item => item.name.toLowerCase() === name.toLowerCase())) {
+        alert("Item with this name already exists!");
+        return;
+      }
+      
+      menuItems.push({ name, price, category });
+      renderMenu();
+      
+      // Clear form
+      nameInput.value = "";
+      priceInput.value = "";
+      categoryInput.value = "drinks";
+      
+      alert(`"${name}" has been added to the menu!`);
+    }
+
+    function addMenu() {
+      menuItems.push({ name: "New Item", price: 0, category: "drinks" });
+      renderMenu();
+    }
+
+    function deleteMenu(index) {
+      if (confirm(`Are you sure you want to delete "${menuItems[index].name}"?`)) {
+        menuItems.splice(index, 1);
+        renderMenu();
+        alert("Item deleted successfully!");
+      }
+    }
+
+    function renderUsers() {
+      const table = document.getElementById("user-table");
+      table.innerHTML = "";
+      users.forEach((u, i) => {
+        table.innerHTML += `<tr>
+          <td><input value="${u.username}" onchange="users[${i}].username=this.value; saveUsers();"></td>
+          <td>
+            <select onchange="users[${i}].role=this.value; saveUsers();">
+              <option value="customer" ${u.role==='customer'?'selected':''}>Customer</option>
+              <option value="staff" ${u.role==='staff'?'selected':''}>Restaurant Staff</option>
+              <option value="admin" ${u.role==='admin'?'selected':''}>Administrator</option>
+            </select>
+          </td>
+          <td><button onclick="deleteUser(${i})">Delete</button></td>
+        </tr>`;
+      });
+      saveUsers();
+    }
+
+    function addUserFromForm() {
+      const usernameInput = document.getElementById("new-username");
+      const roleInput = document.getElementById("new-role");
+      
+      if (!usernameInput || !roleInput) {
+        alert("Form elements not found!");
+        return;
+      }
+      
+      const username = usernameInput.value.trim();
+      const role = roleInput.value;
+      
+      if (!username) {
+        alert("Please enter a username!");
+        usernameInput.focus();
+        return;
+      }
+      
+      // Check if user already exists
+      if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+        alert("User with this username already exists!");
+        return;
+      }
+      
+      users.push({ username, role, password: "password123" }); // Default password
+      renderUsers();
+      
+      // Clear form
+      usernameInput.value = "";
+      roleInput.value = "customer";
+      
+      alert(`User "${username}" has been added!`);
+    }
+
+    function addUser() {
+      users.push({ username: "newuser", role: "customer", password: "password123" });
+      renderUsers();
+    }
+
+    function deleteUser(index) {
+      if (confirm(`Are you sure you want to delete user "${users[index].username}"?`)) {
+        users.splice(index, 1);
+        renderUsers();
+        alert("User deleted successfully!");
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("user");
+      window.location.href = "login.html";
+    }
+
+    // Listen for order received notifications
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'notifications') {
+        checkNotifications();
+      }
+    });
+    
+    window.addEventListener('orderReceived', (e) => {
+      checkNotifications();
+    });
+    
+    function checkNotifications() {
+      const notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+      const unread = notifications.filter(n => !n.read && n.type === 'order_received');
+      if (unread.length > 0) {
+        const latest = unread[unread.length - 1];
+        alert(`📦 ${latest.message}`);
+        // Mark as read
+        const index = notifications.findIndex(n => n.id === latest.id);
+        if (index !== -1) {
+          notifications[index].read = true;
+          localStorage.setItem("notifications", JSON.stringify(notifications));
+        }
+      }
+    }
+    
+    // Check notifications every 2 seconds
+    setInterval(checkNotifications, 2000);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderMenu();
+      renderUsers();
+    });
+    
+  </script>
+
+<button onclick="logout()" style="position:fixed; top:20px; right:20px; padding:10px 15px; background:#5c4033; color:white; border:none; border-radius:8px; cursor:pointer; z-index:1000;">
+  Logout
+</button>
+</body>
+</html>

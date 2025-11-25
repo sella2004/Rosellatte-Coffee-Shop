@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rosellatte Coffee & Sweets</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="logo">
+      <img src="logo/logo_of_coffee.png" alt="Rosellatte Logo">
+      <h1>Rosellatte</h1>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#drinks">Drinks</a></li>
+        <li><a href="#desserts">Desserts</a></li>
+        <li><a href="customer_orders.html">My Orders</a></li> <!-- Add this line -->
+        <li id="user-role"></li>
+        <li><a href="#" id="logout">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h2>Brewed to Perfection</h2>
+      <p>Handcrafted coffee and homemade sweets — just for you.</p>
+      <button class="order-btn" onclick="document.querySelector('#drinks').scrollIntoView({behavior:'smooth'})">Order Now</button>
+    </div>
+  </section>
+
+  <!-- Drinks Section -->
+  <section id="drinks" class="menu-section">
+    <h2>Featured Drinks</h2>
+    <div id="drinks-container" class="menu-items">
+      <div class="item">
+        <img src="logo/Americano.png" alt="Americano">
+        <h3>Americano</h3>
+        <p>Rich, bold espresso mixed with hot water.</p><br/>
+        <p class="price">₱120</p>
+        <button class="add-cart" data-name="Americano" data-price="120">Add to Cart</button>
+      </div>
+      <div class="item">
+        <img src="logo/Cappuccino.png" alt="Cappuccino">
+        <h3>Cappuccino</h3>
+        <p>Perfect balance of espresso, steamed milk, and foam.</p><br/>
+        <p class="price">₱110</p>
+        <button class="add-cart" data-name="Cappuccino" data-price="110">Add to Cart</button>
+      </div>
+      <div class="item">
+        <img src="logo/Matcha Latte.jpg" alt="Matcha Latte">
+        <h3>Matcha Latte</h3>
+        <p>Silky steamed milk poured over smooth espresso.</p><br/>
+        <p class="price">₱140</p>
+        <button class="add-cart" data-name="Matcha Latte" data-price="140">Add to Cart</button>
+      </div>
+      <div class="item">
+        <img src="logo/caramel macchiato.jpg" alt="Macchiato">
+        <h3>Caramel Macchiato</h3>
+        <p>Espresso marked with a spot of steamed milk.</p><br/>
+        <p class="price">₱135</p>
+        <button class="add-cart" data-name="Macchiato" data-price="135">Add to Cart</button>
+      </div>
+      <div class="item">
+        <img src="logo/Espresso.jpg" alt="Espresso">
+        <h3>Espresso</h3>
+        <p>Pure, strong espresso shot to awaken your senses.</p><br/>
+        <p class="price">₱120</p>
+        <button class="add-cart" data-name="Espresso" data-price="120">Add to Cart</button>
+      </div>
+      <div class="item">
+        <img src="logo/Caramel Latte.jpg" alt="Caramel Latte">
+        <h3>Caramel Latte</h3>
+        <p>Espresso and milk sweetened with smooth caramel syrup.</p><br/>
+        <p class="price">₱150</p>
+        <button class="add-cart" data-name="Caramel Latte" data-price="150">Add to Cart</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dessert Section -->
+  <section id="desserts" class="menu-section">
+    <h2>Dessert Menu</h2>
+
+    <h3>Cakes</h3>
+    <div id="cakes-container" class="menu-items">
+      <div class="item">
+        <img src="logo/Classic Cheesecake.jpg" alt="Cheesecake">
+        <h4>Classic Cheesecake</h4>
+        <p>Creamy and rich cheesecake with a buttery crust.</p><br/>
+        <p class="price">₱80</p>
+        <button class="add-cart" data-name="Cheesecake" data-price="80">Add to Cart</button>
+      </div>
+      <div class="item">
+        <img src="logo/Chocolate  lava cake.jpg" alt="Chocolate Lava Cake">
+        <h4>Chocolate Lava Cake</h4>
+        <p>Warm, gooey chocolate center in a soft cake.</p><br/>
+        <p class="price">₱120</p>
+        <button class="add-cart" data-name="Chocolate Lava Cake" data-price="120">Add to Cart</button>
+      </div>
+      <div class="item">
+        <img src="logo/sliced-red-velvet-.jpg" alt="Red Velvet Cake">
+        <h4>Red Velvet Cake</h4>
+        <p>Moist red velvet layers with creamy frosting.</p><br/>
+        <p class="price">₱110</p>
+        <button class="add-cart" data-name="Red Velvet Cake" data-price="110">Add to Cart</button>
+      </div>
+      <div class="item">
+        <img src="logo/vanila cake.jpg" alt="Vanilla Cake">
+        <h4>Vanilla Cake</h4>
+        <p>Classic vanilla layers with a sweet finish.</p><br/>
+        <p class="price">₱140</p>
+        <button class="add-cart" data-name="Vanilla Cake" data-price="140">Add to Cart</button>
+      </div>
+    </div><br/>
+
+    <h3>Muffins</h3>
+    <div id="muffins-container" class="menu-items">
+      <div class="item">
+        <img src="logo/blueberry-muffins.jpg" alt="Blueberry Muffin">
+        <h4>Blueberry Muffin</h4>
+        <p>Fluffy muffin packed with fresh blueberries.</p><br/>
+        <p class="price">₱110</p>
+        <button class="add-cart" data-name="Blueberry Muffin" data-price="90">Add to Cart</button>
+      </div>
+      <div class="item">
+        <img src="logo/Chocolate-Chip-Muffins.jpg" alt="Chocolate Chip Muffin">
+        <h4>Chocolate Chip Muffin</h4>
+        <p>Soft muffin filled with rich chocolate chips.</p><br/>
+        <p class="price">₱80</p>
+        <button class="add-cart" data-name="Chocolate Chip Muffin" data-price="80">Add to Cart</button>
+      </div>
+      <div class="item">
+        <img src="logo/Banana Nut Maffin.jpg" alt="Banana Nut Muffin">
+        <h4>Banana Nut Muffin</h4>
+        <p>Moist muffin with banana and crunchy nuts.</p>
+        <p class="price">₱125</p>
+        <button class="add-cart" data-name="Banana Nut Muffin" data-price="125">Add to Cart</button>
+      </div>
+    </div>
+    
+    <!-- Container for admin-added dessert items -->
+    <div id="admin-desserts-container" class="menu-items"></div>
+  </section>
+
+  <!-- Cart Icon -->
+  <div class="cart-icon" onclick="toggleCart()">
+    🛒
+    <span class="badge" id="cart-badge">0</span>
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay" id="cart-overlay" onclick="closeCart()"></div>
+
+  <!-- Cart Sidebar -->
+  <div class="cart-sidebar" id="cart-sidebar">
+    <div class="cart-sidebar-header">
+      <h2>Your Cart</h2>
+      <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-sidebar-content" id="cart-sidebar-content">
+      <!-- Cart items will be loaded here -->
+    </div>
+    <div class="cart-sidebar-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span>₱<span id="cart-total">0.00</span></span>
+      </div>
+      <select id="payment" class="cart-payment-select">
+        <option value="GCash">GCash</option>
+        <option value="Credit Card">Credit Card</option>
+        <option value="Cash">Cash</option>
+      </select>
+      <button id="checkout" class="cart-checkout-btn" onclick="checkout()">Checkout</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 Rosellatte Coffee & Sweets | Brewed with Love ☕</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    // List of original menu items (hardcoded in HTML)
+    const originalMenuItems = [
+      'Americano', 'Cappuccino', 'Matcha Latte', 'Macchiato', 'Espresso', 'Caramel Latte',
+      'Cheesecake', 'Chocolate Lava Cake', 'Red Velvet Cake', 'Vanilla Cake',
+      'Blueberry Muffin', 'Chocolate Chip Muffin', 'Banana Nut Muffin'
+    ];
+    
+    // Image mapping for admin-added menu items
+    const imageMap = {
+      'Americano': 'logo/Americano.png',
+      'Cappuccino': 'logo/Cappuccino.png',
+      'Matcha Latte': 'logo/Matcha Latte.jpg',
+      'Caramel Macchiato': 'logo/caramel macchiato.jpg',
+      'Espresso': 'logo/Espresso.jpg',
+      'Caramel Latte': 'logo/Caramel Latte.jpg',
+      'Classic Cheesecake': 'logo/Classic Cheesecake.jpg',
+      'Cheesecake': 'logo/Classic Cheesecake.jpg',
+      'Chocolate Lava Cake': 'logo/Chocolate  lava cake.jpg',
+      'Red Velvet Cake': 'logo/sliced-red-velvet-.jpg',
+      'Vanilla Cake': 'logo/vanila cake.jpg',
+      'Blueberry Muffin': 'logo/blueberry-muffins.jpg',
+      'Chocolate Chip Muffin': 'logo/Chocolate-Chip-Muffins.jpg',
+      'Banana Nut Muffin': 'logo/Banana Nut Maffin.jpg'
+    };
+    
+    // Description mapping for admin-added items
+    const descriptionMap = {
+      'Americano': 'Rich, bold espresso mixed with hot water.',
+      'Cappuccino': 'Perfect balance of espresso, steamed milk, and foam.',
+      'Matcha Latte': 'Silky steamed milk poured over smooth espresso.',
+      'Caramel Macchiato': 'Espresso marked with a spot of steamed milk.',
+      'Espresso': 'Pure, strong espresso shot to awaken your senses.',
+      'Caramel Latte': 'Espresso and milk sweetened with smooth caramel syrup.',
+      'Classic Cheesecake': 'Creamy and rich cheesecake with a buttery crust.',
+      'Cheesecake': 'Creamy and rich cheesecake with a buttery crust.',
+      'Chocolate Lava Cake': 'Warm, gooey chocolate center in a soft cake.',
+      'Red Velvet Cake': 'Moist red velvet layers with creamy frosting.',
+      'Vanilla Cake': 'Classic vanilla layers with a sweet finish.',
+      'Blueberry Muffin': 'Fluffy muffin packed with fresh blueberries.',
+      'Chocolate Chip Muffin': 'Soft muffin filled with rich chocolate chips.',
+      'Banana Nut Muffin': 'Moist muffin with banana and crunchy nuts.'
+    };
+    
+    function getImageForItem(itemName) {
+      return imageMap[itemName] || 'logo/logo_of_coffee.png';
+    }
+    
+    function getDescriptionForItem(itemName) {
+      return descriptionMap[itemName] || 'Delicious item from our menu.';
+    }
+    
+    function loadAdminAddedItems() {
+      // Get menu items from localStorage
+      const menuItems = JSON.parse(localStorage.getItem("menuItems")) || [];
+      
+      // Filter out original items - only show admin-added items
+      const adminAddedItems = menuItems.filter(item => {
+        // Check if item name is NOT in original menu
+        return !originalMenuItems.some(original => 
+          original.toLowerCase() === item.name.toLowerCase() ||
+          item.name.toLowerCase().includes(original.toLowerCase()) ||
+          original.toLowerCase().includes(item.name.toLowerCase())
+        );
+      });
+      
+      const drinksContainer = document.getElementById("drinks-container");
+      const adminDessertsContainer = document.getElementById("admin-desserts-container");
+      
+      if (!drinksContainer || !adminDessertsContainer) {
+        return;
+      }
+      
+      // Separate admin-added items by category
+      const adminDrinks = adminAddedItems.filter(item => item.category === 'drinks');
+      const adminDesserts = adminAddedItems.filter(item => item.category === 'desserts');
+      
+      // Add admin-added drinks to drinks section
+      if (adminDrinks.length > 0) {
+        const existingDrinksHTML = drinksContainer.innerHTML;
+        const drinksHTML = adminDrinks.map(item => {
+          // Check if item is already in the container
+          if (existingDrinksHTML.includes(`data-name="${item.name}"`)) {
+            return ''; // Skip if already exists
+          }
+          return `
+          <div class="item">
+            <img src="${getImageForItem(item.name)}" alt="${item.name}" onerror="this.src='logo/logo_of_coffee.png'">
+            <h3>${item.name}</h3>
+            <p>${getDescriptionForItem(item.name)}</p><br/>
+            <p class="price">₱${item.price.toFixed(2)}</p>
+            <button class="add-cart" data-name="${item.name}" data-price="${item.price}" data-listener-attached="false">Add to Cart</button>
+          </div>
+        `;
+        }).filter(html => html !== '').join('');
+        
+        // Append new drinks to existing drinks (don't replace)
+        if (drinksHTML) {
+          drinksContainer.innerHTML += drinksHTML;
+        }
+      }
+      
+      // Add admin-added desserts to desserts section
+      if (adminDesserts.length > 0) {
+        adminDessertsContainer.innerHTML = adminDesserts.map(item => `
+          <div class="item">
+            <img src="${getImageForItem(item.name)}" alt="${item.name}" onerror="this.src='logo/logo_of_coffee.png'">
+            <h4>${item.name}</h4>
+            <p>${getDescriptionForItem(item.name)}</p><br/>
+            <p class="price">₱${item.price.toFixed(2)}</p>
+            <button class="add-cart" data-name="${item.name}" data-price="${item.price}" data-listener-attached="false">Add to Cart</button>
+          </div>
+        `).join('');
+      } else {
+        adminDessertsContainer.innerHTML = '';
+      }
+      
+      // Re-attach event listeners to new admin-added buttons
+      // Use the attachAddToCartListeners function from script.js if available
+      if (typeof attachAddToCartListeners === 'function') {
+        attachAddToCartListeners();
+      }
+    }
+    
+    // Load admin-added items on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      // FIRST: Attach listeners to Featured Drinks buttons (they're already in HTML)
+      if (typeof attachAddToCartListeners === 'function') {
+        attachAddToCartListeners();
+      } else {
+        // If script.js hasn't loaded yet, wait a bit
+        setTimeout(() => {
+          if (typeof attachAddToCartListeners === 'function') {
+            attachAddToCartListeners();
+          }
+        }, 100);
+      }
+      
+      // Then load admin-added items
+      loadAdminAddedItems();
+      
+      // Re-attach cart listeners after loading menu (to catch dynamically added buttons)
+      setTimeout(() => {
+        if (typeof attachAddToCartListeners === 'function') {
+          attachAddToCartListeners();
+        }
+      }, 200);
+      
+      // Listen for menu updates from admin
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'menuItems') {
+          loadAdminAddedItems();
+          setTimeout(() => {
+            if (typeof attachAddToCartListeners === 'function') {
+              attachAddToCartListeners();
+            }
+          }, 200);
+        }
+      });
+      
+      // Also listen for custom event (for same-tab updates)
+      window.addEventListener('menuUpdated', () => {
+        loadAdminAddedItems();
+        setTimeout(() => {
+          if (typeof attachAddToCartListeners === 'function') {
+            attachAddToCartListeners();
+          }
+        }, 200);
+      });
+    });
+    
+    // Also check for menu updates periodically (in case admin updates in same session)
+    setInterval(() => {
+      loadAdminAddedItems();
+      if (typeof attachAddToCartListeners === 'function') {
+        attachAddToCartListeners();
+      }
+    }, 2000);
+    
+    // Fallback: Ensure Featured Drinks buttons work even if script loads late
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (typeof attachAddToCartListeners === 'function') {
+          attachAddToCartListeners();
+        }
+      }, 500);
+    });
+  </script>
+</body>
+</html>
